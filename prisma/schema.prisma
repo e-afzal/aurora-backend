@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+model MainCollection{
+  id Int @default(autoincrement()) @id
+  name String @unique
+  status String @default("inactive")
+  description String
+  image Json
+  collections Collection[]
+   //? To enable 'searching' as per PRISMA DOCS. Google 'prisma full-text search'
+  @@fulltext([name])
+  @@fulltext([name, description])
+}
+
+model Collection{
+  id Int @default(autoincrement()) @id
+  name String @unique
+  description String
+  status String @default("inactive")
+  image Json
+  products Product[]
+  mainCollection MainCollection? @relation(fields: [mainCollectionId], references: [id], onDelete: Cascade) // Creating association between 'MainCollection' and 'Collection'.
+  mainCollectionId Int? @default(1)// Need to pass 'mainCollectionId' on frontend here to create association between this 'sub-collection' and 'mainCollection'
+  //? To enable 'searching' as per PRISMA DOCS. Google 'prisma full-text search'
+  @@fulltext([name])
+}
+
+model Category{
+  id Int @default(autoincrement()) @id
+  name String @unique
+  image Json
+  products Product[]
+}
+
+model Product{
+  product_id Int @default(autoincrement()) @id
+  product_title String @unique
+  product_price Int
+  product_description String
+  product_types String
+  product_tags String
+  published Boolean @db.TinyInt @default(false)
+  product_size Json
+  gold_color Json
+  enamel_colors Json
+  hook_options Json
+  product_images Json
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int? @default(1)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade) // Creating association between 'Collection' and 'Product'.
+  collectionId Int @default(1) // Need to pass 'collectionId' on frontend here to create association between this product and the collection
+  //? To enable 'searching' as per PRISMA DOCS. Google 'prisma full-text search'
+  @@fulltext([product_types])
+  @@fulltext([product_title, product_types])
+}
+
+model User {
+  id Int @default(autoincrement()) @id
+  first_name String
+  last_name String
+  email String @unique
+  password String
+  addresses Json? // Array containing 2 Objects: one is primary and other is secondary. Each contains 'address', 'apartment', 'city', 'country', 'phone' 
+  createdAt DateTime @default(now())
+  orders Order[]
+}
+
+//! BIG NOTE: 'onDelete': Cascade is a NECESSARY option to set to help DELETE
+//! the 'order' associated with a USER when a USER is deleted by ID.
+//? Refer 'Referential Actions' in the Prisma DOCS for more details
+model Order{
+  orderNumber Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  cartItems Json // Items in cart
+  shipping Json // Object containing 'shippingAddress' and 'shippingMethod'
+  payment_status String // "success" or not
+  payment_intent String @unique//payment id as per Stripe
+  fulfillmentStatus String? @default("unfulfilled")
+  fulfilledAt DateTime? //When fulfilled, that date of fulfillment needs to be inserted here
+  subtotalAmt Int? // subtotal price
+  shippingAmt Int? // shipping price
+  taxAmt Int? // tax on subtotal
+  totalAmt Int? // total price
+  discountCode String? // discount code, if any
+  discountAmt Int? // discount amount after applying code
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Creating association between 'User' and 'Order'. 'customerInfo' is found in this
+  userId Int //! Optional to pass 'userId' on frontend as we want NO LOGIN/SIGNUP NEEDED to order
+}
+
+// Terms & Conditions
+model Conditions {
+id Int @default(autoincrement()) @id
+shipping String? @db.Text
+refundAndExchange String? @db.Text
+accountsAndMembership String? @db.Text
+repairsAndDefects String? @db.Text
+payment String? @db.Text
+websiteUsage String? @db.Text
+shoppingAtAurora String? @db.Text
+pricingPolicy String? @db.Text
+propertyAndRisk String? @db.Text
+safetyOfPersonalDetails String? @db.Text
+copyrightAndTrademarks String? @db.Text
+content String? @db.Text
+thirdPartyLinks String? @db.Text
+acceptanceOfTerms String? @db.Text
+backup String? @db.Text
+}
