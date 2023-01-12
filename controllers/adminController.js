@@ -832,7 +832,7 @@ const deleteUserById = (req, res) => {
 const getAllOrders = async (req, res) => {
   //! Need to check if ADMIN first, only then allow access, otherwise 'FORBIDDEN'
   try {
-    const orders = await prisma.order.findMany({
+    const orders = await prisma.orders.findMany({
       select: {
         orderNumber: true,
         createdAt: true,
@@ -877,7 +877,7 @@ const getOrderById = async (req, res) => {
   const id = Number(req.params.id);
   try {
     // Find if Order exists by ID
-    const order = await prisma.order.findUnique({
+    const order = await prisma.orders.findUnique({
       where: {
         orderNumber: id,
       },
@@ -926,7 +926,7 @@ const getAllConditions = async (req, res) => {
         content: true,
         thirdPartyLinks: true,
         acceptanceOfTerms: true,
-        backup: true,
+        backups: true,
       },
     });
 
@@ -1008,7 +1008,7 @@ const updateConditionById = async (req, res) => {
             newBody.thirdPartyLinks || conditions.thirdPartyLinks,
           acceptanceOfTerms:
             newBody.acceptanceOfTerms || conditions.acceptanceOfTerms,
-          backup: newBody.backup || conditions.backup,
+          backups: newBody.backups || conditions.backups,
         },
       });
 

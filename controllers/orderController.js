@@ -15,7 +15,7 @@ const getOrderById = async (req, res) => {
 
   try {
     //Check if order exists
-    const orderExists = await prisma.order.findUnique({
+    const orderExists = await prisma.orders.findUnique({
       where: {
         orderNumber: Number(order_id),
       },

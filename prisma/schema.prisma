@@ -73,13 +73,13 @@ model User {
   password String
   addresses Json? // Array containing 2 Objects: one is primary and other is secondary. Each contains 'address', 'apartment', 'city', 'country', 'phone' 
   createdAt DateTime @default(now())
-  orders Order[]
+  orders Orders[]
 }
 
 //! BIG NOTE: 'onDelete': Cascade is a NECESSARY option to set to help DELETE
 //! the 'order' associated with a USER when a USER is deleted by ID.
 //? Refer 'Referential Actions' in the Prisma DOCS for more details
-model Order{
+model Orders{
   orderNumber Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   cartItems Json // Items in cart
@@ -115,5 +115,5 @@ copyrightAndTrademarks String? @db.Text
 content String? @db.Text
 thirdPartyLinks String? @db.Text
 acceptanceOfTerms String? @db.Text
-backup String? @db.Text
+backups String? @db.Text
 }

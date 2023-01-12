@@ -189,7 +189,7 @@ const getAllConditions = async (req, res) => {
         content: true,
         thirdPartyLinks: true,
         acceptanceOfTerms: true,
-        backup: true,
+        backups: true,
       },
     });
 

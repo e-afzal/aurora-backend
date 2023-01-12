@@ -97,7 +97,7 @@ const retrieveTest = async (req, res) => {
 
     //! Check if 'order' with the same 'payment_intent' exists,
     //! if so, DO NOT create order and send ERROR
-    const orderExists = await prisma.order.findUnique({
+    const orderExists = await prisma.orders.findUnique({
       where: {
         payment_intent: payment_intent,
       },
@@ -123,7 +123,7 @@ const retrieveTest = async (req, res) => {
 
     //* If order with SAME 'payment_intent' DOES NOT exist, create NEW order
     const { subtotalAmt, taxAmt, totalAmt } = calculateAmounts(cartItems);
-    const order = await prisma.order.create({
+    const order = await prisma.orders.create({
       data: {
         cartItems,
         shipping: { shippingAddress: userInfo, shippingMethod: "standard" },
