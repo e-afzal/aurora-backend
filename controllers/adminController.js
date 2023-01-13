@@ -277,7 +277,7 @@ const getCollectionById = async (req, res) => {
 
 const createCollection = async (req, res) => {
   //! Need to check if ADMIN first, only then allow access, otherwise 'FORBIDDEN'
-  const { name, description, status, image } = req.body;
+  const { name, description, status, image, mainCollectionId } = req.body;
 
   try {
     const newCollection = await prisma.collection.create({
@@ -286,6 +286,7 @@ const createCollection = async (req, res) => {
         description,
         status,
         image,
+        mainCollectionId,
       },
     });
 
