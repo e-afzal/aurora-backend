@@ -258,6 +258,7 @@ const getCollectionById = async (req, res) => {
             published: true,
           },
         },
+        mainCollectionId: true,
       },
     });
     // If Product DOES NOT exist
@@ -306,7 +307,7 @@ const createCollection = async (req, res) => {
 const updateCollectionById = async (req, res) => {
   //! Need to check if ADMIN first, only then allow access, otherwise 'FORBIDDEN'
   const id = Number(req.params.id);
-  const { name, description, status, image } = req.body;
+  const { name, description, status, image, mainCollectionId } = req.body;
 
   try {
     //? First search if collection exists:
@@ -326,6 +327,7 @@ const updateCollectionById = async (req, res) => {
           description: description || collection.description,
           status: status || collection.status,
           image: image || collection.image,
+          mainCollectionId: mainCollectionId || collection.mainCollectionId,
         },
       });
 
@@ -384,6 +386,49 @@ const deleteCollectionImage = async (req, res) => {
   } catch (error) {
     res.status(400).send(error.message);
   }
+};
+
+//? For 'updateProduct' page, 'collections' select tag
+const findCollectionForDropdown = async (req, res) => {
+  const { id } = req.params;
+
+  //? Get and send all collections with their 'id' and 'name' to populate dropdown
+  const allCollections = await prisma.collection.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  if (!allCollections) {
+    return res.json({ status: "fail", message: "Collections not found" });
+  }
+
+  //? Get product ID to find product and get its 'collectionId'
+  const productFound = await prisma.product.findUnique({
+    where: {
+      product_id: Number(id),
+    },
+    select: {
+      collectionId: true,
+    },
+  });
+
+  //? Find collection to which product belongs to
+  const collectionBelongsTo = await prisma.collection.findUnique({
+    where: {
+      id: productFound.collectionId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  res.json({
+    status: "success",
+    collections: allCollections,
+    collectionId: collectionBelongsTo.id,
+  });
 };
 
 //* PRODUCT CONTROLLERS
@@ -1079,6 +1124,7 @@ export {
   createCollection,
   deleteCollectionById,
   deleteCollectionImage,
+  findCollectionForDropdown,
   getAllProducts,
   getProductById,
   postNewProduct,
