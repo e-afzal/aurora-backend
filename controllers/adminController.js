@@ -828,31 +828,19 @@ const getUserById = async (req, res) => {
             orderNumber: true,
             fulfillmentStatus: true,
             createdAt: true,
-            total: true,
+            totalAmt: true,
           },
         },
       },
     });
 
-    if (user) {
-      const primaryAddress = user.addresses.find(
-        (eachAddress) => eachAddress.isPrimary
-      );
-      const newUser = {
-        userInfo: {
-          id: user.id,
-          name: `${user.first_name} ${user.last_name}`,
-          email: user.email,
-          primaryAddress,
-        },
-        orderInfo: {
-          orderCount: user.orders.length,
-          totalSpent: user.orders.reduce((prev, curr) => prev + curr.total, 0),
-          orders: user.orders,
-        },
-      };
-      res.json(newUser);
+    if (!user) {
+      return res.json({
+        status: "fail",
+        message: "User not found",
+      });
     }
+    res.json(user);
   } catch (error) {
     prismaDefaultError(error, res);
   }
