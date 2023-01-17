@@ -44,6 +44,9 @@ cloudinary.config({
 });
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("API running..");
+});
 app.use("/api/products", productRoutes);
 app.use("/api/collections", collectionRoutes);
 app.use("/api/auth", authRoutes);
