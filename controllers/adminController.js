@@ -478,6 +478,7 @@ const postNewProduct = async (req, res) => {
     product_size,
     gold_color,
     enamel_colors,
+    stone_color,
     hook_options,
     product_images,
     collectionId,
@@ -494,6 +495,7 @@ const postNewProduct = async (req, res) => {
         product_size,
         gold_color,
         enamel_colors,
+        stone_color,
         hook_options,
         product_price: Number(product_price),
         product_images,
@@ -976,21 +978,40 @@ const getAllConditions = async (req, res) => {
 
 const postNewCondition = async (req, res) => {
   //! Need to check if ADMIN first, only then allow access, otherwise 'FORBIDDEN'
-
-  let newBody = {};
-  for (const item in req.body) {
-    newBody[item] = req.body[item].split("|").join(" ");
-  }
+  const {
+    shipping,
+    refundAndExchange,
+    accountsAndMembership,
+    repairsAndDefects,
+    payment,
+    websiteUsage,
+    shoppingAtAurora,
+    pricingPolicy,
+    propertyAndRisk,
+    safetyOfPersonalDetails,
+    copyrightAndTrademarks,
+    content,
+    thirdPartyLinks,
+    acceptanceOfTerms,
+    backups,
+  } = req.body;
 
   try {
     const newCondition = await prisma.conditions.create({
-      data: newBody,
+      data: req.body,
     });
 
-    res.json({
-      message: "Conditions created successfully!",
-      data: newCondition,
-    });
+    if (newCondition) {
+      res.json({
+        status: "success",
+        message: "Conditions created successfully!",
+      });
+    } else {
+      res.json({
+        status: "fail",
+        message: "Failed to create conditions.",
+      });
+    }
   } catch (error) {
     prismaDefaultError(error, res);
   }
@@ -998,7 +1019,6 @@ const postNewCondition = async (req, res) => {
 
 const updateConditionById = async (req, res) => {
   //! Need to check if ADMIN first, only then allow access, otherwise 'FORBIDDEN'
-
   try {
     //? First search if product exists:
     const conditions = await prisma.conditions.findUnique({
@@ -1008,47 +1028,43 @@ const updateConditionById = async (req, res) => {
     });
 
     if (conditions) {
-      let newBody = {};
-      for (const item in req.body) {
-        newBody[item] = req.body[item].split("|").join(" ").trim();
-      }
-
       const updatedConditions = await prisma.conditions.update({
         where: {
           id: 1,
         },
         data: {
-          shipping: newBody.shipping || conditions.shipping,
+          shipping: req.body.shipping || conditions.shipping,
           refundAndExchange:
-            newBody.refundAndExchange || conditions.refundAndExchange,
+            req.body.refundAndExchange || conditions.refundAndExchange,
           accountsAndMembership:
-            newBody.accountsAndMembership || conditions.accountsAndMembership,
+            req.body.accountsAndMembership || conditions.accountsAndMembership,
           repairsAndDefects:
-            newBody.repairsAndDefects || conditions.repairsAndDefects,
-          payment: newBody.payment || conditions.payment,
-          websiteUsage: newBody.websiteUsage || conditions.websiteUsage,
+            req.body.repairsAndDefects || conditions.repairsAndDefects,
+          payment: req.body.payment || conditions.payment,
+          websiteUsage: req.body.websiteUsage || conditions.websiteUsage,
           shoppingAtAurora:
-            newBody.shoppingAtAurora || conditions.shoppingAtAurora,
-          pricingPolicy: newBody.pricingPolicy || conditions.pricingPolicy,
+            req.body.shoppingAtAurora || conditions.shoppingAtAurora,
+          pricingPolicy: req.body.pricingPolicy || conditions.pricingPolicy,
           propertyAndRisk:
-            newBody.propertyAndRisk || conditions.propertyAndRisk,
+            req.body.propertyAndRisk || conditions.propertyAndRisk,
           safetyOfPersonalDetails:
-            newBody.safetyOfPersonalDetails ||
+            req.body.safetyOfPersonalDetails ||
             conditions.safetyOfPersonalDetails,
           copyrightAndTrademarks:
-            newBody.copyrightAndTrademarks || conditions.copyrightAndTrademarks,
-          content: newBody.content || conditions.content,
+            req.body.copyrightAndTrademarks ||
+            conditions.copyrightAndTrademarks,
+          content: req.body.content || conditions.content,
           thirdPartyLinks:
-            newBody.thirdPartyLinks || conditions.thirdPartyLinks,
+            req.body.thirdPartyLinks || conditions.thirdPartyLinks,
           acceptanceOfTerms:
-            newBody.acceptanceOfTerms || conditions.acceptanceOfTerms,
-          backups: newBody.backups || conditions.backups,
+            req.body.acceptanceOfTerms || conditions.acceptanceOfTerms,
+          backups: req.body.backups || conditions.backups,
         },
       });
 
       res.json({
+        status: "success",
         message: "Conditions updated successfully!",
-        data: updatedConditions,
       });
     } else {
       // If conditions do not exist, return error based response
