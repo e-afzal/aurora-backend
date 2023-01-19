@@ -524,6 +524,7 @@ const updateProductById = async (req, res) => {
     gold_color,
     enamel_colors,
     hook_options,
+    stone_color,
     product_images,
     collectionId,
   } = req.body;
@@ -550,6 +551,7 @@ const updateProductById = async (req, res) => {
           gold_color: gold_color || item.gold_color,
           enamel_colors: enamel_colors || item.enamel_colors,
           hook_options: hook_options || item.hook_options,
+          stone_color: stone_color || item.stone_color,
           product_price: Number(product_price) || item.product_price,
           product_images: product_images || item.product_images,
           collectionId: Number(collectionId) || item.collectionId,
