@@ -481,6 +481,7 @@ const postNewProduct = async (req, res) => {
     stone_color,
     hook_options,
     product_images,
+    inventory,
     collectionId,
   } = req.body;
 
@@ -499,6 +500,7 @@ const postNewProduct = async (req, res) => {
         hook_options,
         product_price: Number(product_price),
         product_images,
+        inventory: Number(inventory),
         collectionId: Number(collectionId),
       },
     });
@@ -526,6 +528,7 @@ const updateProductById = async (req, res) => {
     hook_options,
     stone_color,
     product_images,
+    inventory,
     collectionId,
   } = req.body;
 
@@ -554,6 +557,7 @@ const updateProductById = async (req, res) => {
           stone_color: stone_color || item.stone_color,
           product_price: Number(product_price) || item.product_price,
           product_images: product_images || item.product_images,
+          inventory: inventory || item.inventory,
           collectionId: Number(collectionId) || item.collectionId,
         },
       });

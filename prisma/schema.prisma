@@ -59,6 +59,7 @@ model Product{
   stone_color Json
   hook_options Json
   product_images Json
+  inventory Int @default(0)
   category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int? @default(1)
   collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade) // Creating association between 'Collection' and 'Product'.
