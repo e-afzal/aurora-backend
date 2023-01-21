@@ -1004,7 +1004,23 @@ const postNewCondition = async (req, res) => {
 
   try {
     const newCondition = await prisma.conditions.create({
-      data: req.body,
+      data: {
+        shipping,
+        refundAndExchange,
+        accountsAndMembership,
+        repairsAndDefects,
+        payment,
+        websiteUsage,
+        shoppingAtAurora,
+        pricingPolicy,
+        propertyAndRisk,
+        safetyOfPersonalDetails,
+        copyrightAndTrademarks,
+        content,
+        thirdPartyLinks,
+        acceptanceOfTerms,
+        backups,
+      },
     });
 
     if (newCondition) {
