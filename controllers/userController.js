@@ -246,8 +246,8 @@ const sendMessage = async (req, res) => {
   // send mail with defined transport object
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return console.log(error);
-      // return res.json({ status: "fail", message: "Error encountered" });
+      // return console.log(error);
+      return res.json({ status: "fail", message: "Error encountered" });
     }
 
     // If successful, do the following:

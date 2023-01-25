@@ -530,6 +530,7 @@ const updateProductById = async (req, res) => {
     product_images,
     inventory,
     collectionId,
+    categoryId,
   } = req.body;
 
   try {
@@ -558,6 +559,7 @@ const updateProductById = async (req, res) => {
           product_price: Number(product_price) || item.product_price,
           product_images: product_images || item.product_images,
           inventory: inventory || item.inventory,
+          categoryId: categoryId || item.categoryId,
           collectionId: Number(collectionId) || item.collectionId,
         },
       });
@@ -762,6 +764,52 @@ const deleteCategoryImage = async (req, res) => {
   } catch (error) {
     res.status(400).send(error.message);
   }
+};
+
+//? For 'updateProduct' page, 'categories' select tag
+const findCategoryForDropdown = async (req, res) => {
+  console.log("IN!");
+  const { id } = req.params;
+
+  //? Get and send all categories with their 'id' and 'name' to populate dropdown
+  const allCategories = await prisma.category.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  if (!allCategories) {
+    return res.json({ status: "fail", message: "Categories not found" });
+  }
+
+  //? Get product ID to find product and get its 'categoryId'
+  const productFound = await prisma.product.findUnique({
+    where: {
+      product_id: Number(id),
+    },
+    select: {
+      categoryId: true,
+    },
+  });
+
+  //? Find category to which product belongs to
+  const categoryBelongsTo = await prisma.category.findUnique({
+    where: {
+      id: productFound.categoryId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  console.log(allCategories);
+
+  res.json({
+    status: "success",
+    categories: allCategories,
+    categoryId: categoryBelongsTo.id,
+  });
 };
 
 //* USER CONTROLLERS
@@ -1035,7 +1083,8 @@ const postNewCondition = async (req, res) => {
       });
     }
   } catch (error) {
-    prismaDefaultError(error, res);
+    res.json({ message: error.message });
+    // prismaDefaultError(error, res);
   }
 };
 
@@ -1139,6 +1188,7 @@ export {
   updateCategoryById,
   deleteCategoryById,
   deleteCategoryImage,
+  findCategoryForDropdown,
   getAllMainCollections,
   getMainCollectionById,
   createMainCollection,

@@ -15,6 +15,7 @@ import {
   createCollection,
   deleteCollectionById,
   deleteCollectionImage,
+  findCollectionForDropdown,
   getAllProducts,
   getProductById,
   postNewProduct,
@@ -35,7 +36,7 @@ import {
   updateCategoryById,
   deleteCategoryById,
   deleteCategoryImage,
-  findCollectionForDropdown,
+  findCategoryForDropdown,
 } from "../controllers/adminController.js";
 
 //? MAIN-COLLECTION ROUTES (E.g. Fine Jewelry, Demi-Fine, etc)
@@ -65,6 +66,7 @@ router.post("/categories", postNewCategory);
 router.put("/categories/:id", updateCategoryById);
 router.delete("/categories/:id", deleteCategoryById);
 router.delete("/categories/delete-image/:public_id", deleteCategoryImage);
+router.get("/categories/select/:id", findCategoryForDropdown);
 
 //? PRODUCT ROUTES
 router.get("/products", getAllProducts);
