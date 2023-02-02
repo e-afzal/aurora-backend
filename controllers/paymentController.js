@@ -25,6 +25,18 @@ const makePayment = async (req, res) => {
       // shipping_address_collection: {
       //   allowed_countries: ["US", "CA"],
       // },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            display_name: "Standard shipping rate",
+            fixed_amount: {
+              amount: 50 * 100,
+              currency: "aed",
+            },
+          },
+        },
+      ],
       //? Looping through cartItems from FRONTEND
       line_items: cartItems.map((eachItem) => {
         return {
