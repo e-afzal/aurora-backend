@@ -14,7 +14,7 @@ const prismaDefaultError = (error, res) => {
 
 const makePayment = async (req, res) => {
   //? Get 'cartItems' ARRAY from POST request from 'shipping' page
-  const cartItems = req.body;
+  const { cartItems, shippingPrice } = req.body;
   try {
     //? Create checkout session
     //? For more info, refer: https://stripe.com/docs/api/checkout/sessions/create?lang=node
@@ -31,7 +31,7 @@ const makePayment = async (req, res) => {
             type: "fixed_amount",
             display_name: "Standard shipping rate",
             fixed_amount: {
-              amount: 50 * 100,
+              amount: Number(shippingPrice) * 100,
               currency: "aed",
             },
           },
