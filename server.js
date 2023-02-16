@@ -3,7 +3,7 @@ const app = express();
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
-// import cors from "cors";
+import cors from "cors";
 
 // Route Imports
 import productRoutes from "./routes/productRouter.js";
@@ -22,19 +22,19 @@ app.use(cookieParser());
 dotenv.config();
 
 //! If cors 'enabled', you wont be able to make request from frontend to local server. RE-ENABLE after everything is DONE!
-// app.use(cors());
+app.use(cors());
 
 // CORS TO WORK
-app.use(function (req, res, next) {
-  // res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  next();
-});
+// app.use(function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+//   // res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   res.header("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
+//   next();
+// });
 
 // CLOUDINARY CONFIG
 cloudinary.config({

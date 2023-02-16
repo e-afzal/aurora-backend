@@ -30,7 +30,6 @@ const getAllMainCollections = async (req, res) => {
       });
     res.json(mainCollections);
   } catch (error) {
-    console.log(error);
     prismaDefaultError(error, res);
   }
 };
@@ -628,7 +627,6 @@ const getAllCategories = async (req, res) => {
       });
     res.json(categories);
   } catch (error) {
-    console.log(error);
     prismaDefaultError(error, res);
   }
 };
@@ -768,7 +766,6 @@ const deleteCategoryImage = async (req, res) => {
 
 //? For 'updateProduct' page, 'categories' select tag
 const findCategoryForDropdown = async (req, res) => {
-  console.log("IN!");
   const { id } = req.params;
 
   //? Get and send all categories with their 'id' and 'name' to populate dropdown
@@ -802,8 +799,6 @@ const findCategoryForDropdown = async (req, res) => {
       id: true,
     },
   });
-
-  console.log(allCategories);
 
   res.json({
     status: "success",
@@ -926,10 +921,10 @@ const getAllOrders = async (req, res) => {
       select: {
         orderNumber: true,
         createdAt: true,
-        fulfillmentStatus: true,
         totalAmt: true,
         shipping: true,
         payment_status: true,
+        fulfillmentStatus: true,
         user: {
           select: {
             first_name: true,
@@ -951,7 +946,7 @@ const getAllOrders = async (req, res) => {
         fulfillmentStatus: eachOrder.fulfillmentStatus,
         totalAmt: eachOrder.totalAmt,
         shippingMethod: eachOrder.shipping.shippingMethod,
-        name: `${eachOrder.user.first_name} ${eachOrder.user.last_name}`,
+        // name: `${eachOrder.user.first_name} ${eachOrder.user.last_name}`,
         payment_status: eachOrder.payment_status,
       };
     });

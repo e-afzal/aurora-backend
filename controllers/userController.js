@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 import { Prisma, PrismaClient } from "@prisma/client";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const prisma = new PrismaClient();
 
 const prismaDefaultError = (error, res) => {
@@ -213,8 +216,8 @@ const sendMessage = async (req, res) => {
   const output = `
   <h2>Received enquiry from Aurora website</h2>
   <ul>
-  <li>Name: ${name}</li>
-  <li>Email: ${senderEmail}</li>
+  <li>Name: ${name.trim()}</li>
+  <li>Email: ${senderEmail.trim()}</li>
   <li>Subject: ${subject}</li>
   </ul>
   <h3>Message from enquirer:</h3>
@@ -246,19 +249,37 @@ const sendMessage = async (req, res) => {
   // send mail with defined transport object
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      // return console.log(error);
-      return res.json({ status: "fail", message: "Error encountered" });
+      console.log(error);
+      return res.status(200).json({ success: false });
     }
 
     // If successful, do the following:
-    console.log(info.messageId);
-    return res.status(200).json({
-      status: "success",
-      message: "Message sent successfully!",
-    });
+    return res.status(200).json({ success: true });
     // We want frontend to redirect to other page with what we want
     // Like redirecting to page that says 'email sent' or something
   });
+};
+
+//? Send message via contact form (SENDGRID)
+const sendMessageGrid = async (req, res) => {
+  const { name, senderEmail, subject, message } = req.body;
+  const msg = {
+    to: "essam.afzal@outlook.com", // Change to your recipient
+    from: "eadev.90@gmail.com", // Change to your verified sender
+    subject: subject,
+    text: message,
+    html: `Received email from ${name} with email as ${senderEmail} showing a message as <strong>${message}</strong>`,
+  };
+
+  sgMail
+    .send(msg)
+    .then((data) => {
+      res.status(200).json({ success: true });
+    })
+    .catch((err) => {
+      res.json({ success: false });
+      console.log(err.message);
+    });
 };
 
 export {
@@ -267,4 +288,5 @@ export {
   editAddress,
   getAllConditions,
   sendMessage,
+  sendMessageGrid,
 };

@@ -7,6 +7,7 @@ import {
   loginUser,
   logoutUser,
   profileUser,
+  createUserFromAuth0,
 } from "../controllers/authController.js";
 
 // 'Body' Validation imports
@@ -17,6 +18,7 @@ import protect from "../middleware/auth.js";
 // Auth Middleware
 //? Registering user using middleware
 router.post("/register", validation(userSchema), registerUser);
+router.post("/register/auth0", createUserFromAuth0);
 
 router.post("/login", loginUser);
 router.get("/logout", logoutUser);

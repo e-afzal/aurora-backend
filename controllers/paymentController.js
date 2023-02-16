@@ -73,12 +73,16 @@ const retrievePaymentDetailsById = async (req, res) => {
 
     //? If session data available, send what is needed.
     //? i.e. payment_intent id, payment_status
-    const { payment_intent, payment_status } =
+    const { payment_intent, payment_status, shipping_options } =
       await stripe.checkout.sessions.retrieve(session_id);
 
     res.json({
       status: "success",
-      stripe_data: { payment_status, payment_intent },
+      stripe_data: {
+        payment_status,
+        payment_intent,
+        shippingAmount: shipping_options[0].shipping_amount,
+      },
     });
   } catch (error) {
     prismaDefaultError(error, res);
@@ -86,26 +90,38 @@ const retrievePaymentDetailsById = async (req, res) => {
 };
 
 const retrieveTest = async (req, res) => {
-  function calculateAmounts(itemsArr) {
+  function calculateAmounts(itemsArr, shipCost) {
     //? Calculation of 'subtotalAmt', 'shippingAmt', 'taxAmt', 'totalAmt'
     // Calculate Subtotal Price
     const subtotalAmt =
       itemsArr &&
       itemsArr.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
+
     // Calculate Taxes
     const taxAmt = Math.ceil(subtotalAmt * (5 / 100));
-    // Calculate Total Price
-    const totalAmt = Math.ceil(subtotalAmt + taxAmt);
 
-    return { subtotalAmt, taxAmt, totalAmt };
+    //Shipping cost (divide by 100 since it comes from STRIPE)
+    const shippingCost = shipCost / 100;
+
+    // Calculate Total Price (removed taxAmt since tax included in product pricing)
+    const totalAmt = Math.ceil(subtotalAmt + shippingCost);
+
+    return {
+      subtotalAmt,
+      taxAmt,
+      totalAmt,
+      shippingCost,
+    };
   }
 
   try {
     const { session_id, cartItems, userInfo } = req.body;
 
     //? Get 'payment_intent' and 'payment_status' from Stripe
-    const { payment_intent, payment_status } =
+    const { payment_intent, payment_status, shipping_options } =
       await stripe.checkout.sessions.retrieve(session_id);
+
+    const finalShippingCost = shipping_options[0].shipping_amount;
 
     //! Check if 'order' with the same 'payment_intent' exists,
     //! if so, DO NOT create order and send ERROR
@@ -118,8 +134,9 @@ const retrieveTest = async (req, res) => {
     //! If order with this 'payment_intent' already exists, return SAME order
     //! with the 'payment_intent' and 'payment_status'
     if (orderExists) {
-      const { subtotalAmt, taxAmt, totalAmt } = calculateAmounts(
-        orderExists.cartItems
+      const { subtotalAmt, taxAmt, totalAmt, shippingCost } = calculateAmounts(
+        orderExists.cartItems,
+        finalShippingCost
       );
       return res.json({
         status: "fail",
@@ -129,12 +146,16 @@ const retrieveTest = async (req, res) => {
           subtotalAmt,
           taxAmt,
           totalAmt,
+          shippingCost,
         },
       });
     }
 
     //* If order with SAME 'payment_intent' DOES NOT exist, create NEW order
-    const { subtotalAmt, taxAmt, totalAmt } = calculateAmounts(cartItems);
+    const { subtotalAmt, taxAmt, totalAmt, shippingCost } = calculateAmounts(
+      cartItems,
+      finalShippingCost
+    );
     const order = await prisma.orders.create({
       data: {
         cartItems,
@@ -142,6 +163,7 @@ const retrieveTest = async (req, res) => {
         payment_status,
         payment_intent,
         subtotalAmt,
+        shippingAmt: shippingCost,
         taxAmt,
         totalAmt,
         // userId,

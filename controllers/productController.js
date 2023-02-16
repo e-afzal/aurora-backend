@@ -10,24 +10,61 @@ const prismaDefaultError = (error, res) => {
   }
 };
 
+//? Homepage: "New Arrivals" section
+const fetchNewArrivals = async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      select: {
+        product_id: true,
+        product_title: true,
+        product_images: true,
+      },
+      orderBy: [
+        {
+          product_id: "desc",
+        },
+      ],
+    });
+
+    // Sending only 8 products from total
+    const slicedProducts = products.slice(0, 6);
+    return res.json(slicedProducts);
+  } catch (error) {
+    prismaDefaultError(error, res);
+  }
+};
+
 //? For use on 'SHOP ALL' or 'collections/all' page
 const fetchAllProducts = async (req, res) => {
   try {
-    const products = await prisma.product.findMany({
-      orderBy: {
-        product_price: "desc",
-      },
+    const foundProducts = await prisma.product.findMany({
       select: {
         product_id: true,
         product_images: true,
         product_title: true,
         product_price: true,
         product_types: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
-    if (!products)
+
+    const foundCategories = await prisma.category.findMany({
+      select: {
+        name: true,
+      },
+    });
+
+    if (!foundProducts)
       return res.json({ status: "fail", message: "Products not found." });
-    res.json(products);
+
+    if (!foundCategories)
+      return res.json({ status: "fail", message: "Categories not found" });
+
+    res.json({ products: foundProducts, categories: foundCategories });
   } catch (error) {
     prismaDefaultError(error, res);
   }
@@ -138,6 +175,7 @@ const searchProducts = async (req, res) => {
 };
 
 export {
+  fetchNewArrivals,
   fetchAllProducts,
   fetchProductById,
   fetchCategoryProducts,

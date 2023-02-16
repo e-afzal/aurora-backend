@@ -31,6 +31,59 @@ const sendCookie = (res, token) => {
   });
 };
 
+const createUserFromAuth0 = async (req, res) => {
+  // Get email
+  const { email } = req.body;
+
+  try {
+    // Check if email exists in DB
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        addresses: true,
+        orders: {
+          select: {
+            orderNumber: true,
+            createdAt: true,
+            fulfillmentStatus: true,
+            totalAmt: true,
+            shipping: true,
+          },
+        },
+      },
+    });
+
+    // If user exists, return nothing
+    if (userExists) {
+      return res.json({ message: "User exists", data: userExists });
+    }
+
+    // If user does not exist, create user in DB
+    if (!userExists) {
+      const user = await prisma.user.create({
+        data: {
+          email: email,
+        },
+        select: {
+          email: true,
+          orders: true,
+        },
+      });
+
+      return res.status(200).json({ message: "User created", data: user });
+    }
+  } catch (error) {
+    console.log(error.message);
+    prismaDefaultError(error, res);
+  }
+};
+
 const registerUser = async (req, res) => {
   //! Validation is done using 'YUP' in the 'userRouter' file for values received
   //! PRISMA can be used to check ERROR if email already exists on DATABASE
@@ -164,4 +217,10 @@ const profileUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, profileUser };
+export {
+  createUserFromAuth0,
+  registerUser,
+  loginUser,
+  logoutUser,
+  profileUser,
+};
