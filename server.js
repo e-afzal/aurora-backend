@@ -22,7 +22,11 @@ app.use(cookieParser());
 dotenv.config();
 
 //! If cors 'enabled', you wont be able to make request from frontend to local server. RE-ENABLE after everything is DONE!
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://aurora-jewelry-frontend.onrender.com",
+  })
+);
 
 // CORS TO WORK
 // app.use(function (req, res, next) {
