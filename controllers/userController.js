@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
-import sgMail from "@sendgrid/mail";
+// import sgMail from "@sendgrid/mail";
 import { Prisma, PrismaClient } from "@prisma/client";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const prisma = new PrismaClient();
 
 const prismaDefaultError = (error, res) => {
@@ -261,26 +261,26 @@ const sendMessage = async (req, res) => {
 };
 
 //? Send message via contact form (SENDGRID)
-const sendMessageGrid = async (req, res) => {
-  const { name, senderEmail, subject, message } = req.body;
-  const msg = {
-    to: "essam.afzal@outlook.com", // Change to your recipient
-    from: "eadev.90@gmail.com", // Change to your verified sender
-    subject: subject,
-    text: message,
-    html: `Received email from ${name} with email as ${senderEmail} showing a message as <strong>${message}</strong>`,
-  };
+// const sendMessageGrid = async (req, res) => {
+//   const { name, senderEmail, subject, message } = req.body;
+//   const msg = {
+//     to: "essam.afzal@outlook.com", // Change to your recipient
+//     from: "eadev.90@gmail.com", // Change to your verified sender
+//     subject: subject,
+//     text: message,
+//     html: `Received email from ${name} with email as ${senderEmail} showing a message as <strong>${message}</strong>`,
+//   };
 
-  sgMail
-    .send(msg)
-    .then((data) => {
-      res.status(200).json({ success: true });
-    })
-    .catch((err) => {
-      res.json({ success: false });
-      console.log(err.message);
-    });
-};
+//   sgMail
+//     .send(msg)
+//     .then((data) => {
+//       res.status(200).json({ success: true });
+//     })
+//     .catch((err) => {
+//       res.json({ success: false });
+//       console.log(err.message);
+//     });
+// };
 
 export {
   dashboardDetails,
@@ -288,5 +288,5 @@ export {
   editAddress,
   getAllConditions,
   sendMessage,
-  sendMessageGrid,
+  // sendMessageGrid,
 };
