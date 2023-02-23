@@ -32,10 +32,7 @@ app.use(function (req, res, next) {
   ];
 
   if (corsWhiteList.includes(req.headers.origin)) {
-    res.header(
-      "Access-Control-Allow-Origin",
-      "https://aurora-jewelry-frontend.onrender.com"
-    );
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
     next();
   } else {
     return res.status(403).send("Access denied");
