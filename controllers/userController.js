@@ -234,7 +234,7 @@ const sendMessage = async (req, res) => {
       pass: receiverPass, // generated ethereal password
     },
     tls: {
-      rejectUnauthorized: false, // Done if contact form sent via LOCALHOST
+      rejectUnauthorized: true, // 'false' if contact form sent via LOCALHOST
     },
   });
 

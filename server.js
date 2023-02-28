@@ -26,6 +26,8 @@ app.use(cors());
 
 // CORS TO WORK
 app.use(function (req, res, next) {
+  //? White list should include customer facing sites (production url & development url)
+  //? and the admin dashboard url
   const corsWhiteList = [
     "http://localhost:3000",
     "https://aurora-jewelry-frontend.onrender.com",
@@ -33,6 +35,16 @@ app.use(function (req, res, next) {
 
   if (corsWhiteList.includes(req.headers.origin)) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
+    // ROUTES
+    app.get("/", (res) => {
+      res.send("API running..");
+    });
+    app.use("/api/products", productRoutes);
+    app.use("/api/collections", collectionRoutes);
+    app.use("/api/auth", authRoutes);
+    app.use("/api/users", userRoutes);
+    app.use("/api/orders", orderRoutes);
+    app.use("/api/payments", paymentRoutes);
     next();
   } else {
     return res.status(403).send("Access denied");
@@ -53,15 +65,7 @@ cloudinary.config({
 });
 
 // Routes
-app.get("/", (req, res) => {
-  res.send("API running..");
-});
-app.use("/api/products", productRoutes);
-app.use("/api/collections", collectionRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payments", paymentRoutes);
+//! Create restriction here that origin/frontendUrl should be from ADMIN site or throw FORBIDDEN STATUS
 app.use("/api/admin", adminRoutes);
 
 // Listen for requests
