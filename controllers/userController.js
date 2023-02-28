@@ -235,7 +235,7 @@ const sendMessage = async (req, res) => {
     // port: 25, //587 is original
     // secure: false, // true for 465, false for other ports like 587
     tls: {
-      rejectUnauthorized: false, // 'false' if contact form sent via LOCALHOST
+      rejectUnauthorized: true, // 'false' if contact form sent via LOCALHOST
       // ciphers: "SSLv3",
     },
   });
