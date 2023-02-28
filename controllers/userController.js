@@ -226,15 +226,17 @@ const sendMessage = async (req, res) => {
 
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
+    service: "hotmail",
     host: "smtp-mail.outlook.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
     auth: {
       user: receiverMail, // generated ethereal user
       pass: receiverPass, // generated ethereal password
     },
+    // port: 25, //587 is original
+    // secure: false, // true for 465, false for other ports like 587
     tls: {
-      rejectUnauthorized: true, // 'false' if contact form sent via LOCALHOST
+      rejectUnauthorized: false, // 'false' if contact form sent via LOCALHOST
+      // ciphers: "SSLv3",
     },
   });
 
