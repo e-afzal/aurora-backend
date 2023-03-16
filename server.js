@@ -30,7 +30,7 @@ app.use(function (req, res, next) {
   //? and the admin dashboard url
   const corsWhiteList = [
     "http://localhost:3000",
-    "https://aurora-jewelry-frontend.onrender.com",
+    "https://aurora-frontend.onrender.com",
   ];
 
   if (corsWhiteList.includes(req.headers.origin)) {
