@@ -229,14 +229,13 @@ const sendMessage = async (req, res) => {
     service: "hotmail",
     host: "smtp-mail.outlook.com",
     auth: {
-      user: receiverMail, // generated ethereal user
-      pass: receiverPass, // generated ethereal password
+      user: receiverMail,
+      pass: receiverPass,
     },
     // port: 25, //587 is original
     // secure: false, // true for 465, false for other ports like 587
     tls: {
-      rejectUnauthorized: true, // 'false' if contact form sent via LOCALHOST
-      // ciphers: "SSLv3",
+      rejectUnauthorized: false, // 'false' if contact form sent via LOCALHOST
     },
   });
 
@@ -262,27 +261,59 @@ const sendMessage = async (req, res) => {
   });
 };
 
-//? Send message via contact form (SENDGRID)
-// const sendMessageGrid = async (req, res) => {
-//   const { name, senderEmail, subject, message } = req.body;
-//   const msg = {
-//     to: "essam.afzal@outlook.com", // Change to your recipient
-//     from: "eadev.90@gmail.com", // Change to your verified sender
-//     subject: subject,
-//     text: message,
-//     html: `Received email from ${name} with email as ${senderEmail} showing a message as <strong>${message}</strong>`,
-//   };
+const sendMessageMailersend = async (req, res) => {
+  const { name, senderEmail, subject, message } = req.body;
 
-//   sgMail
-//     .send(msg)
-//     .then((data) => {
-//       res.status(200).json({ success: true });
-//     })
-//     .catch((err) => {
-//       res.json({ success: false });
-//       console.log(err.message);
-//     });
-// };
+  const receiverMail = process.env.SENDER_EMAIL;
+  const receiverPass = process.env.SENDER_PASS;
+
+  const output = `
+  <h2>Received enquiry from Aurora website</h2>
+  <ul>
+  <li>Name: ${name.trim()}</li>
+  <li>Email: ${senderEmail.trim()}</li>
+  <li>Subject: ${subject}</li>
+  </ul>
+  <h3>Message from enquirer:</h3>
+  <p>${message}</p>
+  `;
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    service: "hotmail",
+    host: "smtp-mail.outlook.com",
+    auth: {
+      user: receiverMail,
+      pass: receiverPass,
+    },
+    // port: 25, //587 is original
+    // secure: false, // true for 465, false for other ports like 587
+    tls: {
+      rejectUnauthorized: false, // 'false' if contact form sent via LOCALHOST
+    },
+  });
+
+  let mailOptions = {
+    from: `"Nodemailer Contact" <${receiverMail}>`, // sender address
+    to: receiverMail, // list of receivers
+    subject: subject, // Subject line
+    text: message, // plain text body
+    html: output, // html body
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      return res.status(200).json({ success: false });
+    }
+
+    // If successful, do the following:
+    return res.status(200).json({ success: true });
+    // We want frontend to redirect to other page with what we want
+    // Like redirecting to page that says 'email sent' or something
+  });
+};
 
 export {
   dashboardDetails,
@@ -290,5 +321,5 @@ export {
   editAddress,
   getAllConditions,
   sendMessage,
-  // sendMessageGrid,
+  sendMessageMailersend,
 };

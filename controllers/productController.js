@@ -18,6 +18,7 @@ const fetchNewArrivals = async (req, res) => {
         product_id: true,
         product_title: true,
         product_images: true,
+        product_price: true,
       },
       orderBy: [
         {
@@ -83,6 +84,7 @@ const fetchProductById = async (req, res) => {
     }
     res.json(product);
   } catch (error) {
+    console.log(error);
     prismaDefaultError(error, res);
   }
 };

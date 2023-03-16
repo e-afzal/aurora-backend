@@ -8,7 +8,7 @@ import {
   deleteAddress,
   getAllConditions,
   sendMessage,
-  // sendMessageGrid,
+  sendMessageMailersend,
 } from "../controllers/userController.js";
 
 // ROUTES
@@ -17,6 +17,6 @@ router.put("/changeAddress", editAddress);
 router.put("/deleteAddress", deleteAddress);
 router.get("/conditions/condition", getAllConditions);
 router.post("/message", sendMessage);
-// router.post("/message-grid", sendMessageGrid);
+router.post("/message-mailersend", sendMessage);
 
 export default router;
